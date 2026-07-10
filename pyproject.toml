@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "wiki-skills"
+dynamic = ["version", "license"]
+description = 'Agent tools and skills to read and write wiki in Open Knowledge Format (OKF)'
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Chenchao Zhao", email = "chenchao.zhao.dev@gmail.com" },
+]
+dependencies = [
+    "fire",
+    "loguru",
+    "markdown-it-py",
+]
+
+[tool.hatch.version]
+path = "src/wiki_skills/__about__.py"
+
+[tool.hatch.envs.default]
+type = "pip-compile"
+python = "3.12"
+dependencies = ["pytest", "mypy", "ruff"]
+
+[tool.hatch.envs.default.scripts]
+typing = "mypy --install-types --non-interactive src/"
+fmt = "ruff check src/ tests/"
+release = ["fmt", "typing", "hatch test --cover"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/wiki_skills"]
