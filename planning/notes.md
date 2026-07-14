@@ -38,91 +38,61 @@
 | Subcommand | Purpose | Key flags |
 |---|---|---|
 | `install` | Install SKILL.md + supporting files to agent skills dir | `--target <dir>` (default: `~/.agents/skills/`) |
-| `index` | Walk OKF bundle, generate INDEX.md + state.parquet | `--output <path>` (default: `<bundle>/.wiki-skills/`) |
+| `index` | Walk OKF bundle, update state.db | `--output <path>` (default: `<bundle>/.wiki-skills/`), `--full` (force complete rebuild) |
 | `validate` | Lint OKF bundle for conformance + check index staleness | (none — ruff-style stdout output) |
+| `query` | Execute SQL against state.db (fallback if sqlite3 CLI unavailable) | `--db <path>` (default: `<bundle>/.wiki-skills/state.db`), positional `SQL` arg |
 
-* **Bundled skills:** `wiki-compose` (write OKF + lint) and `wiki-find` (index + grep + glob). Installed via `wiki-cli install`.
-* **Agent workflow:** `wiki-cli index` → generates INDEX.md → agent uses `grep` to search metadata (type, tags, etc.) → agent uses `glob` on matching file paths. No database, no custom query engine. Agents already have grep and glob tools.
-* **Search subcommand:** Not needed. Agents compose grep + glob natively.
+* **Bundled skills:** `wiki-compose` (write OKF + lint) and `wiki-find` (index + sqlite3 query + glob). Installed via `wiki-cli install`.
+* **Agent workflow:** `wiki-cli index` → updates `state.db` → agent uses `sqlite3` CLI to query by type, tags, description → agent uses `glob` on matching file paths to open actual files. No custom query engine. Agents already have sqlite3 and glob tools.
+* **Search subcommand:** Not needed. Agents compose sqlite3 + glob natively.
 
-### Index File Strategy — Markdown over SQLite
-* **Approach:** `wiki-cli index` walks the OKF bundle directory tree, parses frontmatter from each `.md` file, and writes a single **markdown index file** (default: `<bundle>/.wiki-skills/INDEX.md`).
-* **State format:** `.wiki-skills/state.parquet` — pandas DataFrame as the cache/state. INDEX.md is always derived from this state, never the source of truth. Columns: `path`, `type`, `title`, `description`, `resource`, `tags` (list[str], parquet list column), `timestamp`, `content_hash`. Sorted by: `path`, `type`, `timestamp`.
-* **Incremental rebuild:** Load existing parquet into DataFrame, walk bundle, compare `content_hash` per file. In-place updates:
-  - New files → parse frontmatter, `pd.concat` new row
-  - Changed files → re-parse, update row in-place
-  - Deleted files → `df.drop` row
-  - Write parquet → regenerate INDEX.md from DataFrame
-* **Index format:** Three sections, all grep-friendly.
-  ```markdown
-  # Wiki Index
-
-  ## Table
-
-  | Path | Type | Title | Tags | Timestamp |
-  |---|---|---|---|---|
-  | concepts/index.md | index | Concepts Index | | 2026-07-01 |
-  | concepts/log.md | log | Concepts Log | | 2026-07-01 |
-  | concepts/tables.md | concept | Tables | schema, db | 2026-07-01 |
-  | concepts/tables/users.md | concept | Users Table | schema, db | 2026-07-02 |
-
-  ## Documents by Tags
-
-  ### tag :: db
-  - concepts/tables.md
-  - concepts/tables/users.md
-
-  ### tag :: schema
-  - concepts/tables.md
-  - concepts/tables/users.md
-
-  ## Documents by Types
-
-  ### type :: concept
-  - concepts/tables.md
-  - concepts/tables/users.md
-
-  ### type :: index
-  - concepts/index.md
-
-  ### type :: log
-  - concepts/log.md
+### Index File Strategy — SQLite as Source of Truth
+* **Approach:** `wiki-cli index` walks the OKF bundle directory tree, parses frontmatter from each `.md` file, and writes directly to a **SQLite database** (default: `<bundle>/.wiki-skills/state.db`). No markdown index is generated.
+* **State format:** `.wiki-skills/state.db` — SQLite database as the sole cache/state. Schema:
+  ```sql
+  CREATE TABLE files (
+      path TEXT PRIMARY KEY,
+      type TEXT NOT NULL,
+      title TEXT,
+      description TEXT,
+      resource TEXT,
+      tags TEXT,          -- JSON array: '["db","schema"]'
+      timestamp TEXT,
+      content_hash TEXT NOT NULL,  -- SHA-256 of file content
+      mtime REAL NOT NULL         -- file modification time (float, epoch seconds)
+  );
   ```
-* **Agent grep patterns:**
-  - `grep "type :: concept" INDEX.md` → all concept files
-  - `grep "tag :: db" INDEX.md` → all files tagged "db"
-  - `grep "| concept |" INDEX.md` → concept rows in table
-* **Generation from DataFrame:**
-  ```python
-  def generate_index_md(df: pd.DataFrame) -> str:
-      lines: list[str] = ["# Wiki Index", ""]
-
-      # Section 1: Table
-      lines += ["## Table", ""]
-      lines += ["| Path | Type | Title | Tags | Timestamp |",
-                 "|---|---|---|---|---|"]
-      for _, row in df.iterrows():
-          tags = ", ".join(row["tags"]) if row["tags"] else ""
-          lines.append(f"| {row['path']} | {row['type']} | {row['title']} | {tags} | {row['timestamp']} |")
-
-      # Section 2: Documents by Tags (explode for speed)
-      lines += ["", "## Documents by Tags", ""]
-      has_tags = df[df["tags"].apply(lambda x: isinstance(x, list) and len(x) > 0)]
-      exploded = has_tags.explode("tags")
-      for tag, group in exploded.groupby("tags")["path"].apply(sorted).items():
-          lines += [f"### tag :: {tag}", ""]
-          lines += [f"- {p}" for p in group]
-          lines.append("")
-
-      # Section 3: Documents by Types
-      lines += ["## Documents by Types", ""]
-      for type_name, group in df.groupby("type")["path"].apply(list).items():
-          lines += [f"### type :: {type_name}", ""]
-          lines += [f"- {p}" for p in group]
-          lines.append("")
-
-      return "\n".join(lines)
+* **Agent query workflow:** Agents use `sqlite3` CLI to query the database directly:
+  ```bash
+  sqlite3 .wiki-skills/state.db "SELECT path FROM files WHERE type = 'concept'"
+  sqlite3 .wiki-skills/state.db "SELECT path FROM files WHERE tags LIKE '%db%'"
+  sqlite3 .wiki-skills/state.db "SELECT path, description FROM files WHERE description LIKE '%users%'"
   ```
+  If `sqlite3` CLI is unavailable, agents fall back to `wiki-cli query`:
+  ```bash
+  wiki-cli query "SELECT path FROM files WHERE type = 'concept'"
+  ```
+  No index regeneration needed — the DB is always current after `wiki-cli index`.
+* **Incremental rebuild (content hashing):** No git dependency for change detection. Uses `content_hash` (SHA-256) and `mtime` stored per file:
+  1. Walk bundle directory, collect all `.md` files with current `mtime`
+  2. For each file: if `mtime` unchanged since last index → skip (fast path)
+  3. If `mtime` changed or file is new → re-hash content, compare against stored `content_hash`
+  4. Hash differs → re-parse frontmatter, `UPDATE` row
+  5. New file → parse frontmatter, `INSERT` row
+  6. Deleted file (in DB but not on disk) → `DELETE` row
+* **Fallback mode (no git or `--full`):** Same content hashing logic, but skips the mtime optimization — re-hashes every file. Used when git is unavailable OR `--full` flag is passed.
+
+### CLI Dependency Checks
+* **Utility function:** `check_cli(name: str) -> bool` — wraps `shutil.which()` to verify a CLI tool is available on PATH. Used at startup by subcommands that depend on external tools.
+* **Required CLIs:**
+
+| CLI | Required by | Fallback |
+|---|---|---|
+| `sqlite3` | `index`, `validate` | Warn + agents use `wiki-cli query` instead (Python sqlite3 module) |
+| `grep` | Agent workflows (via bundled skills) | No fallback — agent's responsibility |
+
+* **Startup behavior:** `index` and `validate` call `check_cli("sqlite3")` first. If missing, log warning: `WARN — sqlite3 CLI not found, use 'wiki-cli query' to search state.db`.
+* **Note:** `git` is NOT required. Content hashing handles change detection regardless of version control.
 
 ### Validate Subcommand — OKF Conformance Linter
 * **Output model:** Ruff-style. Human-readable lines to stdout, exit code = worst severity.
@@ -132,7 +102,8 @@
   ```
 * **Exit codes:** `0` = clean, `1` = warnings only, `2` = errors present.
 * **No `--strict` flag.** Severity tiers are always shown. Exit code alone determines pass/fail.
-* **Index staleness check:** validate also checks if `.wiki-skills/index.md` is up to date. It walks the bundle, builds what the index *should* contain, then diffs against the existing index file. Warns if stale (files added/removed/changed since last `index` run).
+* **DB staleness check:** validate checks if `state.db` is stale by comparing file mtimes in the DB against current filesystem mtimes. If any file's mtime is newer than what's stored, emit WARN: `WARN — state.db is stale, run 'wiki-cli index' to update`.
+* **DB freshness check:** If `state.db` does not exist, emit WARN: `WARN — state.db not found, run 'wiki-cli index' first`.
 * **Validation rules:**
 
 | Rule | Severity | Description |
@@ -142,13 +113,16 @@
 | Bad timestamp format | WARN | Not ISO 8601 |
 | Bad tags format | WARN | Not a list of strings |
 | Empty bundle | WARN | No concept files found in bundle |
-| Index stale | WARN | `.wiki-skills/INDEX.md` out of date (or missing) |
+| Index stale | WARN | `state.db` out of date (detected via mtime comparison) |
 * **Directory argument:** Optional positional arg for wiki root. Defaults to CWD. `.wiki-skills/` directory lives inside the wiki root.
   ```
-  wiki-cli index                 # indexes CWD as wiki root
+  wiki-cli index                 # indexes CWD as wiki root (incremental if git available)
   wiki-cli index ./my-wiki       # indexes specific bundle
+  wiki-cli index --full          # forces complete rebuild even if git available
   wiki-cli validate              # validates CWD
   wiki-cli validate ./my-wiki    # validates specific bundle
+  wiki-cli query "SELECT path FROM files WHERE type = 'concept'"
+  wiki-cli query --db ./my-wiki/.wiki-skills/state.db "SELECT * FROM files"
   ```
 
 ### Bundled Skills — Agent Workflows
@@ -163,21 +137,22 @@
   4. If errors, agent fixes and re-validates
 
 #### wiki-find
-* **Purpose:** Find document paths by metadata (type, tags, etc.). Runs `wiki-cli index` first to ensure index is current.
+* **Purpose:** Find document paths by metadata (type, tags, etc.). Runs `wiki-cli index` first to ensure state.db is current.
 * **Workflow:**
-  1. Agent runs `wiki-cli index [path]` to build/update INDEX.md
-  2. Agent uses `grep` on INDEX.md to search by type, tag, or content
-  3. Agent uses `glob` on matching paths to open actual files
+  1. Agent runs `wiki-cli index [path]` to build/update state.db
+  2. Agent checks if `sqlite3` CLI is available (`which sqlite3`)
+  3. If available: agent uses `sqlite3` CLI to query state.db directly
+  4. If not: agent uses `wiki-cli query "SQL"` as fallback
+  5. Agent uses `glob` on matching paths to open actual files
+* **SKILL.md instruction:** Will tell agent to prefer `sqlite3` CLI when available, fall back to `wiki-cli query`.
 
 ## Alternatives Considered (For Final Append)
-* **SQLite + FTS5 database index:** Rejected — over-engineered for the actual caller (AI agents). Agents already have grep/glob. SQLite adds complexity (FTS5 tokenizer config, WAL mode, foreign keys, schema migration) with no payoff over a simple markdown file that grep can search.
-* **INDEX.md as cache (parse-and-diff):** Rejected — couples output format to rebuild logic. If INDEX.md format changes, rebuild breaks. Cleaner to have a structured state (parquet) and derive output from it.
-* **JSON state file:** Rejected — slower reads at scale, no columnar access. Parquet with pandas gives in-place row updates and fast I/O.
-* **Flag-based `search` subcommand:** Rejected — hits ceiling on complex queries (OR, joins, aggregations). Flag→SQL translation is maintenance for a caller that doesn't need the abstraction. May revisit as sugar later.
-* **Unified `search --sql` passthrough:** Rejected — two modes in one command creates ambiguity (combine flags + SQL? or mutually exclusive?). Doubled error surface. Separate `query` is cleaner.
-* **Hardcoded skills directory for `install`:** Rejected in favor of configurable `--target` with default `~/.agents/skills/`. More agent-agnostic.
-* **JSONL output format:** Deferred — markdown table is sufficient and more human-readable. Can add `--format jsonl` later if needed.
-* **Comma-separated tags string:** Replaced with `list[str]` in parquet. Avoids delimiter ambiguity with multi-word tags, leverages parquet's native list column type.
+* **SQLite + FTS5 database index:** Rejected — full-text search is over-engineered for the actual workload. Agents can compose `sqlite3` queries + `grep` for content search. FTS5 adds tokenizer config complexity with no payoff.
+* **INDEX.md as cache:** Rejected — redundant with SQLite state. Agents can query `state.db` directly via `sqlite3` CLI. No need to regenerate a markdown file that duplicates the same data.
+* **Parquet state (pandas):** Rejected — immutable columnar format requires full file rewrite on every row change. No stdlib support, adds pyarrow/fastparquet dependency (~50MB). Worse manual inspection story. SQLite gives native row-level CRUD, stdlib access, and `sqlite3` CLI for ad-hoc queries.
+* **JSON state file:** Rejected — slower reads at scale, no columnar access, no standard query language.
+* **Flag-based `search` subcommand:** Rejected — hits ceiling on complex queries (OR, joins, aggregations). Flag→SQL translation is maintenance for a caller that doesn't need the abstraction. Agents compose sqlite3 queries natively.
+* **Hash-only incremental rebuild (no git):** Rejected — always walks full bundle to compare `content_hash`. Slower, no way to detect deletions without scanning. Content hashing with mtime optimization is strictly better.
 
 ## Open Questions (to resume)
 * None — all design decisions resolved. Ready for implementation.
@@ -186,8 +161,8 @@
 ### Project Info
 - **Name:** wiki-skills
 - **Purpose:** Python CLI + agent-skill package for AI agents to navigate large OKF wikis
-- **Key features:** Index generation (parquet state → markdown output), metadata grep, path glob, bundled skills (wiki-compose, wiki-find)
-- **Stack:** Python >=3.11, hatchling build, fire CLI, loguru, markdown-it-py, pandas (parquet I/O)
+- **Key features:** Index generation (SQLite state.db), metadata queries via sqlite3 CLI, path glob, bundled skills (wiki-compose, wiki-find)
+- **Stack:** Python >=3.11, hatchling build, fire CLI, loguru, markdown-it-py, sqlite3 (stdlib)
 - **Current state:** Empty package (v0.1.0), no source code yet
 
 ### OKF Spec Sources
