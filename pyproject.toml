@@ -21,9 +21,10 @@ dependencies = [
 path = "src/wiki_skills/__about__.py"
 
 [tool.hatch.envs.default]
-type = "pip-compile"
+type = "virtual"
 python = "3.12"
 path = ".venv"
+pip-compile = true
 dependencies = ["pytest", "mypy", "ruff"]
 
 [tool.hatch.envs.default.scripts]
