@@ -21,8 +21,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          model: copilot/gpt-4.1
-          use_github_token: true
+          # model: # use default model
+          use_github_token: true  # Use the GitHub token for authentication
           prompt: |
             Review this pull request:
             - Check for code quality issues
