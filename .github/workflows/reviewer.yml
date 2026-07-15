@@ -21,10 +21,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # You can change this to "minimax/big-pickle" or "zhipu/glm-4" 
-          # depending on which Zen model you prefer to rotate to.
-          model: "groq/grok-code-fast-1"
-          use_github_token: true  # Use the GitHub token for authentication
+          # Free tier options:
+          #   opencode/big-pickle
+          #   opencode/deepseek-v4-flash-free
+          #   opencode/mimo-v2.5-free
+          #   opencode/north-mini-code-free
+          #   opencode/nemotron-3-ultra-free
+          model: opencode/deepseek-v4-flash-free
+          use_github_token: true
           prompt: |
             Review this pull request:
             - Check for code quality issues
