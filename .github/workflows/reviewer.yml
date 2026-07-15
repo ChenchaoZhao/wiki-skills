@@ -21,7 +21,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # model: # use default model
+          # You can change this to "minimax/big-pickle" or "zhipu/glm-4" 
+          # depending on which Zen model you prefer to rotate to.
+          model: "groq/grok-code-fast-1"
           use_github_token: true  # Use the GitHub token for authentication
           prompt: |
             Review this pull request:
