@@ -18,10 +18,12 @@ wiki-skills is a Python CLI and agent-skill package with a hatchling build syste
 - [ ] Dependencies declared: `fire`, `loguru`, `markdown-it-py`
 - [ ] `hatch fmt` and `hatch test` work (even if tests are empty)
 - [ ] All functions have type annotations per AGENTS.md conventions
+- [ ] GitHub Actions CI pipeline created (`.github/workflows/ci.yml`) — triggers on new PRs and pushes to `main`, runs `hatch run release` (fmt + typing + tests)
+- [ ] GitHub Actions reviewer pipeline created (`.github/workflows/reviewer.yml`) — triggers on new PRs, runs opencode as a code reviewer
 
 ## Technical Notes and Implementation Hints
 
-- Core Files: `pyproject.toml`, `src/wiki_skills/__init__.py`, `src/wiki_skills/__about__.py`
+- Core Files: `pyproject.toml`, `src/wiki_skills/__init__.py`, `src/wiki_skills/__about__.py`, `.github/workflows/ci.yml`, `.github/workflows/reviewer.yml`
 - API / Database Schema impact: None at this stage
 - Security/Performance considerations: Follow AGENTS.md conventions: no magic numbers, type annotations on everything, UPPER_SNAKE_CASE constants
 

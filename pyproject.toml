@@ -23,6 +23,7 @@ path = "src/wiki_skills/__about__.py"
 [tool.hatch.envs.default]
 type = "pip-compile"
 python = "3.12"
+path = ".venv"
 dependencies = ["pytest", "mypy", "ruff"]
 
 [tool.hatch.envs.default.scripts]
@@ -32,6 +33,19 @@ release = ["fmt", "typing", "hatch test --cover"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[project.scripts]
+wiki-cli = "wiki_skills.cli:main"
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+
+# fire has no type stubs or py.typed marker — skip import analysis for it
+[[tool.mypy.overrides]]
+module = ["fire.*"]
+ignore_missing_imports = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/wiki_skills"]
