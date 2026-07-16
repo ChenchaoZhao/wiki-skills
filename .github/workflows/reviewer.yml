@@ -32,9 +32,9 @@ jobs:
           prompt: |
             Review this pull request:
             - Look for potential bugs and security risks
-            - The tests are useful
+            - Verify the tests are useful
             - Suggest improvements if any
-            - Approve the pull request if no critical bugs found
+            - Approve if no critical bugs found
   reviewer_two:
     runs-on: ubuntu-latest
     permissions:
@@ -61,6 +61,6 @@ jobs:
           use_github_token: true
           prompt: |
             Review this pull request:
-            - Check for code quality issues: clarity, organization
+            - Focus on code quality such as clarity, organization
             - Verify the changes achieved what was described in pull request messages
-            - Approve the pull request if no critical bugs were found and codes matched the descriptions and goals
+            - Approve if no critical misalignments found
