@@ -10,8 +10,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      pull-requests: write    # Add this line
-      issues: write           # Add this line for issue reactions/comments
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,27 +20,27 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Free tier options:
-          #   opencode/big-pickle
-          #   opencode/deepseek-v4-flash-free
-          #   opencode/mimo-v2.5-free
-          #   opencode/north-mini-code-free
-          #   opencode/nemotron-3-ultra-free
           model: opencode/deepseek-v4-flash-free
           use_github_token: true
           prompt: |
-            Review this pull request:
-            - Look for potential bugs and security risks
-            - The tests are useful
-            - Suggest improvements if any
-            - Approve the pull request if no critical bugs found
+            Review this pull request and output your decision in this format:
+            [REVIEW_DECISION]
+            STATUS: APPROVE | REQUEST_CHANGES | COMMENT
+            REASON: <explanation>
+            [/REVIEW_DECISION]
+            
+            Focus on: bugs, security, test usefulness
+
+      - uses: ./.github/actions/parse-and-review
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
   reviewer_two:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
-      pull-requests: write    # Add this line
-      issues: write           # Add this line for issue reactions/comments
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,16 +50,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Free tier options:
-          #   opencode/big-pickle
-          #   opencode/deepseek-v4-flash-free
-          #   opencode/mimo-v2.5-free
-          #   opencode/north-mini-code-free
-          #   opencode/nemotron-3-ultra-free
-          model: opencode/big-pickle
+          model: opencode/deepseek-v4-flash-free
           use_github_token: true
           prompt: |
-            Review this pull request:
-            - Check for code quality issues: clarity, organization
-            - Verify the changes achieved what was described in pull request messages
-            - Approve the pull request if no critical bugs were found and codes matched the descriptions and goals
+            Review this pull request and output your decision in this format:
+            [REVIEW_DECISION]
+            STATUS: APPROVE | REQUEST_CHANGES | COMMENT
+            REASON: <explanation>
+            [/REVIEW_DECISION]
+            
+            Focus on: code quality, organization, PR description alignment
+
+      - uses: ./.github/actions/parse-and-review
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
