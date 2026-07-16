@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
-  review:
+  reviewer_one:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -31,7 +31,36 @@ jobs:
           use_github_token: true
           prompt: |
             Review this pull request:
-            - Check for code quality issues
-            - Look for potential bugs
-            - Verify type annotations follow project conventions
-            - Suggest improvements
+            - Look for potential bugs and security risks
+            - Verify the tests are useful
+            - Suggest improvements if any
+            - Approve if no critical bugs found
+  reviewer_two:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write    # Add this line
+      issues: write           # Add this line for issue reactions/comments
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: anomalyco/opencode/github@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Free tier options:
+          #   opencode/big-pickle
+          #   opencode/deepseek-v4-flash-free
+          #   opencode/mimo-v2.5-free
+          #   opencode/north-mini-code-free
+          #   opencode/nemotron-3-ultra-free
+          model: opencode/big-pickle
+          use_github_token: true
+          prompt: |
+            Review this pull request:
+            - Focus on code quality such as clarity, organization
+            - Verify the changes achieved what was described in pull request messages
+            - Approve if no critical misalignments found
