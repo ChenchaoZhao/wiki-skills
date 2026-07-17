@@ -1,6 +1,6 @@
 ---
 assignee: ""
-status: "To Do"
+status: "Done"
 priority: "High"
 issue_type: "Task"
 ---
@@ -12,14 +12,14 @@ wiki-skills is a Python CLI and agent-skill package with a hatchling build syste
 
 ## Acceptance Criteria
 
-- [ ] `pyproject.toml` created with hatchling build system, Python >=3.11
-- [ ] `src/wiki_skills/` package directory exists with `__init__.py` and `__about__.py` containing a version string
-- [ ] `wiki-cli` console_scripts entry point defined pointing to `wiki_skills.cli:main`
-- [ ] Dependencies declared: `fire`, `loguru`, `markdown-it-py`
-- [ ] `hatch fmt` and `hatch test` work (even if tests are empty)
-- [ ] All functions have type annotations per AGENTS.md conventions
-- [ ] GitHub Actions CI pipeline created (`.github/workflows/ci.yml`) — triggers on new PRs and pushes to `main`, runs `hatch run release` (fmt + typing + tests)
-- [ ] GitHub Actions reviewer pipeline created (`.github/workflows/reviewer.yml`) — triggers on new PRs, runs opencode as a code reviewer
+- [x] `pyproject.toml` created with hatchling build system, Python >=3.11
+- [x] `src/wiki_skills/` package directory exists with `__init__.py` and `__about__.py` containing a version string
+- [x] `wiki-cli` console_scripts entry point defined pointing to `wiki_skills.cli:main`
+- [x] Dependencies declared: `fire`, `loguru`, `markdown-it-py`
+- [x] `hatch fmt` and `hatch test` work (even if tests are empty)
+- [x] All functions have type annotations per AGENTS.md conventions
+- [x] GitHub Workflows CI pipeline created (`.github/workflows/ci.yml`) — triggers on new PRs and pushes to `main`, runs `hatch run release` (fmt + typing + tests)
+- [x] GitHub Workflows reviewer pipeline created (`.github/workflows/reviewer.yml`) — triggers on new PRs, runs opencode as a code reviewer
 
 ## Technical Notes and Implementation Hints
 
