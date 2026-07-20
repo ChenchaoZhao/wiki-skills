@@ -1,6 +1,6 @@
 ---
 assignee: ""
-status: "To Do"
+status: "Done"
 priority: "High"
 issue_type: "Task"
 ---
@@ -12,12 +12,12 @@ Section 4 of the design document defines OKF data structures in Python. These ty
 
 ## Acceptance Criteria
 <!-- Absolute, binary criteria derived from the design document. -->
-- [ ] `ConceptMetadata` TypedDict defined in `wiki.py` with all fields from spec: `type`, `title`, `description`, `resource`, `tags`, `timestamp`
-- [ ] `type` field is required (not `NotRequired`), all others are `NotRequired`
-- [ ] `RESERVED_TYPES` constant defined as `frozenset({"index", "log"})`
-- [ ] `concept_id_from_path(path: str, root: str) -> str` helper function that strips `.md` extension and returns relative path
-- [ ] All type annotations present, no `# type: ignore` without explanation
-- [ ] Unit tests for `concept_id_from_path` with nested paths, root-level files, and edge cases
+- [x] `DocumentMetadata` TypedDict defined in `wiki.py` with all fields from spec: `type`, `title`, `description`, `resource`, `tags`, `timestamp`
+- [x] `type` field is required (not `NotRequired`), all others are `NotRequired`
+- [x] `RESERVED_TYPES` constant defined as `frozenset({"index", "log"})`
+- [x] `document_id_from_path(path: str, root: str) -> str` helper function that strips `.md` extension and returns relative path
+- [x] All type annotations present, no `# type: ignore` without explanation
+- [x] Unit tests for `concept_id_from_path` with nested paths, root-level files, and edge cases
 
 ## Technical Notes and Implementation Hints
 <!-- Map this to the system architecture described in the design doc. -->
