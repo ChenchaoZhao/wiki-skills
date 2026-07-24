@@ -1,6 +1,6 @@
 ---
 assignee: ""
-status: "To Do"
+status: "Done"
 priority: "High"
 issue_type: "Task"
 ---
@@ -12,12 +12,12 @@ CLI tools like `sqlite3` and `grep` are used by various commands and agent workf
 
 ## Acceptance Criteria
 <!-- Absolute, binary criteria derived from the design document. -->
-- [ ] `check_cli(name: str) -> bool` function exists in `deps.py`
-- [ ] Uses `shutil.which()` internally
-- [ ] Returns `True` if tool is found on PATH, `False` otherwise
-- [ ] `REQUIRED_CLI_TOOLS` constant defined as `frozenset({"sqlite3", "grep"})`
-- [ ] Unit tests for `check_cli` — test with a known tool (e.g., `"python"`) and a non-existent tool
-- [ ] No external dependencies beyond stdlib
+- [x] `check_cli(name: str) -> bool` function exists in `deps.py`
+- [x] Uses `shutil.which()` internally
+- [x] Returns `True` if tool is found on PATH, `False` otherwise
+- [x] `REQUIRED_CLI_TOOLS` constant defined as `frozenset({"sqlite3", "grep"})`
+- [x] Unit tests for `check_cli` — test with a known tool (e.g., `"python"`) and a non-existent tool
+- [x] No external dependencies beyond stdlib
 
 ## Technical Notes and Implementation Hints
 <!-- Map this to the system architecture described in the design doc. -->
