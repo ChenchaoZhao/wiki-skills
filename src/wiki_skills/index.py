@@ -10,7 +10,7 @@ import frontmatter
 from loguru import logger
 
 from wiki_skills.deps import check_cli
-from wiki_skills.wiki import RESERVED_TYPES
+from wiki_skills.wiki import DEFAULT_TYPE, RESERVED_TYPES
 
 if TYPE_CHECKING:
     from wiki_skills.wiki import DocumentMetadata
@@ -64,18 +64,18 @@ def parse_frontmatter(path: Path) -> DocumentMetadata:
     with at least a ``type`` key (defaulting to ``"concept"`` when absent,
     or *path.stem* if *path.stem* is in :data:`~wiki_skills.wiki.RESERVED_TYPES`).
     """
-    default_type = path.stem if path.stem in RESERVED_TYPES else "concept"
+    default_type = path.stem if path.stem in RESERVED_TYPES else DEFAULT_TYPE
     post = frontmatter.load(str(path))
     if not post.metadata:
         logger.warning("No frontmatter found in {}", path)
         return {"type": default_type}
 
-    t = post.metadata.get("type")
-    if not t and path.stem in RESERVED_TYPES:
-        t = path.stem
+    doc_type = post.metadata.get("type")
+    if not doc_type and path.stem in RESERVED_TYPES:
+        doc_type = path.stem
 
     metadata: DocumentMetadata = {
-        "type": str(t if t is not None else default_type),
+        "type": str(doc_type if doc_type is not None else default_type),
     }
     for key in ("title", "description", "resource", "timestamp"):
         if key in post.metadata:
