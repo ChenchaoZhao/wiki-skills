@@ -4,16 +4,17 @@ import sqlite3
 import sys
 from pathlib import Path
 
-DEFAULT_QUERY_DB: str = ""
+DEFAULT_QUERY_DB: str | None = None
 
 
-def query(sql: str, db: str = DEFAULT_QUERY_DB) -> None:
+def query(sql: str, db: str | None = DEFAULT_QUERY_DB) -> None:
     """Execute *sql* against a ``state.db`` and print results to stdout.
 
-    When *db* is empty, the default path ``<CWD>/.wiki-skills/state.db`` is
-    used.  Results are printed as column-separated values with a header row.
+    When *db* is ``None``, the default path ``<CWD>/.wiki-skills/state.db``
+    is used.  Results are printed as column-separated values with a header
+    row.
     """
-    db_path = Path(db) if db else Path.cwd() / ".wiki-skills" / "state.db"
+    db_path = Path(db) if db is not None else Path.cwd() / ".wiki-skills" / "state.db"
 
     if not db_path.exists():
         print(f"ERROR — database not found: {db_path}", file=sys.stderr)  # noqa: T201
