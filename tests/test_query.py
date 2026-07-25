@@ -43,9 +43,9 @@ class TestQuerySuccess:
         output = capsys.readouterr().out
         lines = output.strip().splitlines()
         header, row_a, row_b = lines
-        assert header == "path  type"
-        assert row_a == "a.md  concept"
-        assert row_b == "b.md  reference"
+        assert header == "path\ttype"
+        assert row_a == "a.md\tconcept"
+        assert row_b == "b.md\treference"
 
     def test_shows_header_when_no_matching_rows(self, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
         db_path = tmp_path / "state.db"
@@ -55,7 +55,7 @@ class TestQuerySuccess:
 
         output = capsys.readouterr().out
         lines = output.strip().splitlines()
-        assert lines[0] == "path  type  title"
+        assert lines[0] == "path\ttype\ttitle"
 
     def test_prints_no_results_for_dml(self, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
         db_path = tmp_path / "state.db"
@@ -74,8 +74,8 @@ class TestQuerySuccess:
 
         output = capsys.readouterr().out
         lines = output.strip().splitlines()
-        assert lines[0] == "path  type  title"
-        assert lines[1] == "doc.md  concept  Doc"
+        assert lines[0] == "path\ttype\ttitle"
+        assert lines[1] == "doc.md\tconcept\tDoc"
 
 
 # ---------------------------------------------------------------------------
