@@ -103,7 +103,8 @@ def _index_one(
 
     if not full:
         row = conn.execute(
-            f"SELECT mtime FROM {FILES_TABLE} WHERE path = ?",
+            # FILES_TABLE is a module constant, not user-controlled
+            f"SELECT mtime FROM {FILES_TABLE} WHERE path = ?",  # noqa: S608
             (rel,),
         ).fetchone()
         if row and row[0] == current_mtime:
@@ -156,11 +157,13 @@ def index(path: str = DEFAULT_INDEX_PATH, *, full: bool = DEFAULT_FULL) -> None:
             _index_one(conn, md_file, bundle_root, full=full)
 
         # Remove files that no longer exist on disk.
-        rows = conn.execute(f"SELECT path FROM {FILES_TABLE}").fetchall()
+        # FILES_TABLE is a module constant, not user-controlled
+        rows = conn.execute(f"SELECT path FROM {FILES_TABLE}").fetchall()  # noqa: S608
         for (db_path,) in rows:
             if db_path not in on_disk:
                 conn.execute(
-                    f"DELETE FROM {FILES_TABLE} WHERE path = ?",
+                    # FILES_TABLE is a module constant, not user-controlled
+                    f"DELETE FROM {FILES_TABLE} WHERE path = ?",  # noqa: S608
                     (db_path,),
                 )
                 logger.debug("Removed deleted file from index: {}", db_path)
