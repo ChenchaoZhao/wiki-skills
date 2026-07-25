@@ -116,6 +116,61 @@ class TestParseFrontmatter:
         f.write_text("---\n# this is a comment\ntype: log\n---\n")
         assert parse_frontmatter(f)["type"] == "log"
 
+    def test_only_type_no_optional_fields(self, tmp_path: Path) -> None:
+        f = tmp_path / "doc.md"
+        f.write_text("---\ntype: concept\n---\n# Body\n")
+        meta = parse_frontmatter(f)
+        assert meta == {"type": "concept"}
+        assert "title" not in meta
+        assert "description" not in meta
+        assert "resource" not in meta
+        assert "tags" not in meta
+        assert "timestamp" not in meta
+
+    def test_type_and_title_only(self, tmp_path: Path) -> None:
+        f = tmp_path / "doc.md"
+        f.write_text('---\ntype: reference\ntitle: "Only Title"\n---\n')
+        meta = parse_frontmatter(f)
+        assert meta == {"type": "reference", "title": "Only Title"}
+
+    def test_type_and_tags_only(self, tmp_path: Path) -> None:
+        f = tmp_path / "doc.md"
+        f.write_text("---\ntype: concept\ntags: [api]\n---\n")
+        meta = parse_frontmatter(f)
+        assert meta == {"type": "concept", "tags": ["api"]}
+
+    def test_missing_tags_stored_as_none(self, tmp_path: Path) -> None:
+        f = tmp_path / "doc.md"
+        f.write_text("---\ntype: concept\n---\n")
+        index(path=str(tmp_path))
+        db_path = tmp_path / DB_DIR_NAME / DB_NAME
+        conn = sqlite3.connect(str(db_path))
+        try:
+            row = conn.execute(
+                f"SELECT tags FROM {FILES_TABLE} WHERE path = ?",
+                ("doc.md",),
+            ).fetchone()
+            assert row is not None
+            assert row[0] is None
+        finally:
+            conn.close()
+
+    def test_empty_tags_stored_as_empty_list(self, tmp_path: Path) -> None:
+        f = tmp_path / "doc.md"
+        f.write_text("---\ntype: concept\ntags: []\n---\n")
+        index(path=str(tmp_path))
+        db_path = tmp_path / DB_DIR_NAME / DB_NAME
+        conn = sqlite3.connect(str(db_path))
+        try:
+            row = conn.execute(
+                f"SELECT tags FROM {FILES_TABLE} WHERE path = ?",
+                ("doc.md",),
+            ).fetchone()
+            assert row is not None
+            assert json.loads(row[0]) == []
+        finally:
+            conn.close()
+
 
 # ---------------------------------------------------------------------------
 # index — DB creation and table schema
