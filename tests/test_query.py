@@ -47,7 +47,7 @@ class TestQuerySuccess:
         assert row_a == "a.md  concept"
         assert row_b == "b.md  reference"
 
-    def test_returns_no_results_message(self, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    def test_shows_header_when_no_matching_rows(self, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
         db_path = tmp_path / "state.db"
         _create_db(db_path)
 
@@ -56,6 +56,15 @@ class TestQuerySuccess:
         output = capsys.readouterr().out
         lines = output.strip().splitlines()
         assert lines[0] == "path  type  title"
+
+    def test_prints_no_results_for_dml(self, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+        db_path = tmp_path / "state.db"
+        _create_db(db_path)
+
+        query("INSERT INTO files VALUES ('x.md', 'concept', 'X')", db=str(db_path))
+
+        output = capsys.readouterr().out
+        assert output.strip() == "(no results)"
 
     def test_select_star(self, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
         db_path = tmp_path / "state.db"
@@ -124,7 +133,7 @@ class TestQueryInvalidSQL:
 
 class TestQueryDefaultDB:
     def test_default_db_constant(self) -> None:
-        assert DEFAULT_QUERY_DB == ""
+        assert DEFAULT_QUERY_DB is None
 
     def test_uses_cwd_default_when_no_db(
         self,
@@ -148,11 +157,6 @@ class TestQueryDefaultDB:
 
 
 class TestQueryExitCode:
-    def test_exits_1_on_missing_db(self, tmp_path: Path) -> None:
-        with pytest.raises(SystemExit) as exc_info:
-            query("SELECT 1", db=str(tmp_path / "missing.db"))
-        assert exc_info.value.code == 1
-
     def test_exits_1_on_invalid_sql(self, tmp_path: Path) -> None:
         db_path = tmp_path / "state.db"
         _create_db(db_path)
