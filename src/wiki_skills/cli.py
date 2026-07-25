@@ -1,13 +1,17 @@
 import fire
-from loguru import logger
 
+from wiki_skills.index import index
 from wiki_skills.query import query
+from wiki_skills.validate import validate
 
 
 def main() -> None:
     """Entry point for wiki-skills CLI."""
-    logger.info("wiki-skills CLI")
-    fire.Fire({"query": query})
+    fire.Fire({
+        "index": index,
+        "validate": validate,
+        "query": query,
+    })
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 ---
 assignee: ""
-status: "To Do"
+status: "In Progress"
 priority: "Medium"
 issue_type: "Task"
 ---
@@ -12,15 +12,15 @@ Section 5 — CLI Entry Point. The CLI is the primary interface for agents. It m
 
 ## Acceptance Criteria
 <!-- Absolute, binary criteria derived from the design document. -->
-- [ ] `cli.py` with `main()` function using `fire.Fire`
-- [ ] All 4 subcommands wired: `install`, `index`, `validate`, `query`
-- [ ] `wiki-cli --help` shows all subcommands with descriptions
-- [ ] `wiki-cli <subcommand> --help` shows flags for each subcommand
-- [ ] Entry point registered in `pyproject.toml` as `wiki-cli = "wiki_skills.cli:main"`
-- [ ] Graceful error handling for missing subcommand arguments
-- [ ] No logic in `cli.py` beyond wiring — all logic in respective modules
-- [ ] Unit test that `main()` can be invoked without error (smoke test)
-- [ ] All type annotations present
+- [x] `cli.py` with `main()` function using `fire.Fire`
+- [ ] All 4 subcommands wired: `install`, `index`, `validate`, `query` (3/4 done; `install` pending ticket 007)
+- [x] `wiki-cli --help` shows all subcommands with descriptions
+- [x] `wiki-cli <subcommand> --help` shows flags for each subcommand
+- [x] Entry point registered in `pyproject.toml` as `wiki-cli = "wiki_skills.cli:main"`
+- [x] Graceful error handling for missing subcommand arguments
+- [x] No logic in `cli.py` beyond wiring — all logic in respective modules
+- [x] Unit test that `main()` can be invoked without error (smoke test)
+- [x] All type annotations present
 
 ## Technical Notes and Implementation Hints
 <!-- Map this to the system architecture described in the design doc. -->
@@ -32,3 +32,7 @@ Section 5 — CLI Entry Point. The CLI is the primary interface for agents. It m
 ## Resources and Design Context
 - Design Doc Section: Section 5 — CLI Entry Point
 - Related Tickets: 004 (index), 005 (validate), 006 (query), 007 (install)
+
+## Notes
+- `install` subcommand deferred to ticket 007 — will be wired into `cli.py` once `install.py` is implemented.
+- Removed `loguru` import from `cli.py` as it was unused (fire handles all CLI output).
