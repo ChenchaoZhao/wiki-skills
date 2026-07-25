@@ -1,6 +1,6 @@
 ---
 assignee: ""
-status: "To Do"
+status: "Done"
 priority: "Medium"
 issue_type: "Task"
 ---
@@ -12,16 +12,16 @@ Section 5 — `wiki-cli query`. Execute SQL against `state.db`. Fallback for whe
 
 ## Acceptance Criteria
 <!-- Absolute, binary criteria derived from the design document. -->
-- [ ] `query(sql: str, db: str | None = None) -> None` function in `query.py`
-- [ ] Default DB path: `<CWD>/.wiki-skills/state.db`
-- [ ] `--db` flag to override DB path
-- [ ] Uses Python's `sqlite3` module (stdlib)
-- [ ] Executes arbitrary SQL and prints results to stdout
-- [ ] Handles missing DB file gracefully with error message
-- [ ] Handles SQL syntax errors gracefully with error message
-- [ ] Output format: column-separated values with header row
-- [ ] Unit tests for: successful query, missing DB, invalid SQL
-- [ ] All type annotations present
+- [x] `query(sql: str, db: str | None = None) -> None` function in `query.py`
+- [x] Default DB path: `<CWD>/.wiki-skills/state.db`
+- [x] `--db` flag to override DB path
+- [x] Uses Python's `sqlite3` module (stdlib)
+- [x] Executes arbitrary SQL and prints results to stdout
+- [x] Handles missing DB file gracefully with error message
+- [x] Handles SQL syntax errors gracefully with error message
+- [x] Output format: column-separated values with header row
+- [x] Unit tests for: successful query, missing DB, invalid SQL
+- [x] All type annotations present
 
 ## Technical Notes and Implementation Hints
 <!-- Map this to the system architecture described in the design doc. -->
