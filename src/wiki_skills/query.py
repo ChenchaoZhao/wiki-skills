@@ -30,9 +30,9 @@ def query(sql: str, db: str | None = DEFAULT_QUERY_DB) -> None:
         columns = [desc[0] for desc in cursor.description]
         rows = cursor.fetchall()
 
-        print("  ".join(columns))  # noqa: T201
+        print("\t".join(columns))  # noqa: T201
         for row in rows:
-            print("  ".join(str(v) for v in row))  # noqa: T201
+            print("\t".join(str(v) for v in row))  # noqa: T201
     except sqlite3.OperationalError as exc:
         print(f"ERROR — SQL error: {exc}", file=sys.stderr)  # noqa: T201
         sys.exit(1)
