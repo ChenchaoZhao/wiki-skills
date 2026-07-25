@@ -10,7 +10,6 @@ import frontmatter
 from loguru import logger
 
 from wiki_skills.deps import check_cli
-from wiki_skills.wiki import RESERVED_TYPES
 
 if TYPE_CHECKING:
     from wiki_skills.wiki import DocumentMetadata
@@ -61,21 +60,15 @@ def parse_frontmatter(path: Path) -> DocumentMetadata:
 
     Uses ``python-frontmatter`` to parse the YAML block between ``---``
     delimiters.  Returns a :class:`~wiki_skills.wiki.DocumentMetadata` dict
-    with at least a ``type`` key (defaulting to ``"concept"`` when absent,
-    or *path.stem* if *path.stem* is in :data:`~wiki_skills.wiki.RESERVED_TYPES`).
+    with at least a ``type`` key (defaulting to ``"concept"`` when absent).
     """
-    default_type = path.stem if path.stem in RESERVED_TYPES else "concept"
     post = frontmatter.load(str(path))
     if not post.metadata:
         logger.warning("No frontmatter found in {}", path)
-        return {"type": default_type}
-
-    t = post.metadata.get("type")
-    if not t and path.stem in RESERVED_TYPES:
-        t = path.stem
+        return {"type": "concept"}
 
     metadata: DocumentMetadata = {
-        "type": str(t if t is not None else default_type),
+        "type": str(post.metadata.get("type", "concept")),
     }
     for key in ("title", "description", "resource", "timestamp"):
         if key in post.metadata:
