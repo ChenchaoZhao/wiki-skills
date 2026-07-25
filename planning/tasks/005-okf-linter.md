@@ -1,6 +1,6 @@
 ---
 assignee: ""
-status: "To Do"
+status: "Done"
 priority: "Medium"
 issue_type: "Task"
 ---
@@ -12,18 +12,18 @@ Lints an OKF bundle for conformance against the rules defined in Section 4. Prov
 
 ## Acceptance Criteria
 <!-- Absolute, binary criteria derived from the design document. -->
-- [ ] `validate(path: str = ".") -> int` function in `validate.py`, returns exit code (0/1/2)
-- [ ] Checks every non-reserved `.md` file has non-empty `type` in frontmatter (ERROR)
-- [ ] Handles unparseable YAML frontmatter gracefully (ERROR)
-- [ ] Validates `timestamp` is ISO 8601 format (WARN)
-- [ ] Validates `tags` is a list of strings (WARN)
-- [ ] Detects empty bundle — no concept files found (WARN)
-- [ ] Checks `state.db` staleness by comparing file mtimes (WARN)
-- [ ] If `state.db` missing, emits WARN
-- [ ] Ruff-style output format: `path:line: type: message`
-- [ ] Reserved files (`index.md`, `log.md`) are skipped for `type` checks
-- [ ] Unit tests for each conformance rule
-- [ ] All type annotations present
+- [x] `validate(path: str = ".") -> int` function in `validate.py`, returns exit code (0/1/2)
+- [x] Checks every non-reserved `.md` file has non-empty `type` in frontmatter (ERROR)
+- [x] Handles unparseable YAML frontmatter gracefully (ERROR)
+- [x] Validates `timestamp` is ISO 8601 format (WARN)
+- [x] Validates `tags` is a list of strings (WARN)
+- [x] Detects empty bundle — no concept files found (WARN)
+- [x] Checks `state.db` staleness by comparing file mtimes (WARN)
+- [x] If `state.db` missing, emits WARN
+- [x] Ruff-style output format: `path:line: type: message`
+- [x] Reserved files (`index.md`, `log.md`) are skipped for `type` checks
+- [x] Unit tests for each conformance rule
+- [x] All type annotations present
 
 ## Technical Notes and Implementation Hints
 <!-- Map this to the system architecture described in the design doc. -->
