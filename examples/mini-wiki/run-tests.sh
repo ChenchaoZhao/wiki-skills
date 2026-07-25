@@ -23,12 +23,26 @@ echo "SUCCESS: Validation passed."
 
 echo "=== 3. Querying concepts ==="
 set -x
-wiki-cli query "SELECT path FROM files WHERE type = 'concept'"
+out3="$(wiki-cli query "SELECT path FROM files WHERE type = 'concept'")"
 { set +x; } 2>/dev/null
+echo "$out3"
+for f in users.md tables/orders.md tables/products.md; do
+    if ! echo "$out3" | grep -q "$f"; then
+        echo "ERROR: Expected $f in concept query output!" >&2
+        exit 1
+    fi
+done
 
 echo "=== 4. Querying tag-based lookup ==="
 set -x
-wiki-cli query "SELECT path, tags FROM files WHERE tags LIKE '%db%'"
+out4="$(wiki-cli query "SELECT path, tags FROM files WHERE tags LIKE '%db%'")"
 { set +x; } 2>/dev/null
+echo "$out4"
+for f in users.md tables/orders.md tables/products.md; do
+    if ! echo "$out4" | grep -q "$f"; then
+        echo "ERROR: Expected $f in tag query output!" >&2
+        exit 1
+    fi
+done
 
 echo "=== All integration tests passed successfully! ==="
