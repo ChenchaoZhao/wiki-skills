@@ -1,6 +1,6 @@
 ---
 assignee: ""
-status: "To Do"
+status: "Done"
 priority: "High"
 issue_type: "Task"
 ---
@@ -12,18 +12,18 @@ Section 6 — Index Strategy. The index tracks all markdown files in a bundle so
 
 ## Acceptance Criteria
 <!-- Absolute, binary criteria derived from the design document. -->
-- [ ] `index(path: str = ".", full: bool = False) -> None` function in `index.py`
-- [ ] Creates `.wiki-skills/` directory and `state.db` if not exists
-- [ ] `CREATE TABLE IF NOT EXISTS` for the `files` table
-- [ ] Content hashing uses `hashlib.sha256`
-- [ ] Frontmatter extraction from `.md` files (YAML between `---` delimiters)
-- [ ] Incremental mode: skips files with unchanged mtime
-- [ ] Full mode: re-hashes all files regardless of mtime
-- [ ] Deleted files (in DB but not on disk) are removed from DB
-- [ ] `tags` stored as JSON string in DB
-- [ ] Uses `check_cli("sqlite3")` from deps.py at startup with warning if missing
-- [ ] Unit tests for: frontmatter parsing, content hashing, incremental vs full rebuild, deleted file cleanup
-- [ ] All type annotations present
+- [x] `index(path: str = ".", full: bool = False) -> None` function in `index.py`
+- [x] Creates `.wiki-skills/` directory and `state.db` if not exists
+- [x] `CREATE TABLE IF NOT EXISTS` for the `files` table
+- [x] Content hashing uses `hashlib.sha256`
+- [x] Frontmatter extraction from `.md` files (YAML between `---` delimiters)
+- [x] Incremental mode: skips files with unchanged mtime
+- [x] Full mode: re-hashes all files regardless of mtime
+- [x] Deleted files (in DB but not on disk) are removed from DB
+- [x] `tags` stored as JSON string in DB
+- [x] Uses `check_cli("sqlite3")` from deps.py at startup with warning if missing
+- [x] Unit tests for: frontmatter parsing, content hashing, incremental vs full rebuild, deleted file cleanup
+- [x] All type annotations present
 
 ## Technical Notes and Implementation Hints
 <!-- Map this to the system architecture described in the design doc. -->
