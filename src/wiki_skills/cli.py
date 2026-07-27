@@ -1,6 +1,7 @@
 import fire
 
 from wiki_skills.index import index
+from wiki_skills.install import install
 from wiki_skills.query import query
 from wiki_skills.validate import validate
 
@@ -8,6 +9,7 @@ from wiki_skills.validate import validate
 def main() -> None:
     """Entry point for wiki-skills CLI."""
     fire.Fire({
+        "install": install,
         "index": index,
         "validate": validate,
         "query": query,

@@ -1,6 +1,6 @@
 ---
 assignee: ""
-status: "To Do"
+status: "Done"
 priority: "Medium"
 issue_type: "Task"
 ---
@@ -22,16 +22,16 @@ The install command copies these to the target directory, preserving the directo
 
 ## Acceptance Criteria
 <!-- Absolute, binary criteria derived from the design document. -->
-- [ ] `install(target: str = "~/.agents/skills/") -> None` function (could be in `install.py` or `cli.py`)
-- [ ] Default target: `~/.agents/skills/`
-- [ ] Expands `~` in target path
-- [ ] Creates target directory if it doesn't exist
-- [ ] Copies `wiki-compose/SKILL.md` and `wiki-find/SKILL.md` to `<target>/wiki-compose/` and `<target>/wiki-find/`
-- [ ] Overwrites existing files silently (idempotent)
-- [ ] Uses `shutil.copytree` or equivalent
-- [ ] Logs each copied file path
-- [ ] Unit tests for: default target expansion, directory creation, file copying
-- [ ] All type annotations present
+- [x] `install(target: str = "~/.agents/skills/") -> None` function (could be in `install.py` or `cli.py`)
+- [x] Default target: `~/.agents/skills/`
+- [x] Expands `~` in target path
+- [x] Creates target directory if it doesn't exist
+- [x] Copies `wiki-compose/SKILL.md` and `wiki-find/SKILL.md` to `<target>/wiki-compose/` and `<target>/wiki-find/`
+- [x] Overwrites existing files silently (idempotent)
+- [x] Uses `shutil.copytree` or equivalent
+- [x] Logs each copied file path
+- [x] Unit tests for: default target expansion, directory creation, file copying
+- [x] All type annotations present
 
 ## Technical Notes and Implementation Hints
 <!-- Map this to the system architecture described in the design doc. -->
