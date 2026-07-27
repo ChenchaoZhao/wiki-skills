@@ -1,7 +1,7 @@
 # wiki-skills
 
 [![CI](https://github.com/chenchaozhao/wiki-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/chenchaozhao/wiki-skills/actions/workflows/ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/wiki-skills?cacheSeconds=120)](https://pypi.org/project/wiki-skills/)
+[![PyPI version](https://img.shields.io/pypi/v/wiki-skills?cacheSeconds=10)](https://pypi.org/project/wiki-skills/)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
