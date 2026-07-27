@@ -8,17 +8,12 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
-      - name: Install uv
-        run: pip install uv
 
       - name: Install hatch
         run: pip install hatch
@@ -30,3 +25,5 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
+          attestations: false
+          print-hash: false
