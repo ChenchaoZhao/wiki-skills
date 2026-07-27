@@ -17,6 +17,20 @@ Use this skill when the user wants to:
 
 ## Workflow
 
+### Step 0: Ensure `wiki-skills` is installed
+
+The `wiki-cli` commands require the `wiki-skills` package. Verify it is installed:
+
+```bash
+wiki-cli --version
+```
+
+If the command fails, install the package first:
+
+```bash
+uv tool install wiki-skills
+```
+
 ### Step 1: Build or update the index
 
 Before querying, ensure the index is current:
@@ -52,14 +66,10 @@ wiki-cli query "SELECT path FROM files WHERE type = 'concept'"
 
 - When `--db` is omitted, `wiki-cli query` uses `<CWD>/.wiki-skills/state.db`.
 
-### Step 4: Resolve file paths with `glob`
+### Step 4: Resolve file paths
 
-Query results return relative paths (e.g., `tables/orders`). Use `glob` to resolve these to actual filesystem paths:
+Query results return relative paths. Use the `glob` tool to resolve these to actual filesystem paths: e.g. `tables/orders` glob pattern: `**/tables/orders.md`
 
-```bash
-# Find the file matching a concept path
-glob "**/tables/orders.md"
-```
 
 ## Database Schema
 

@@ -49,6 +49,20 @@ Filenames `index.md` and `log.md` are **reserved** and should not be edited with
 
 ## Workflow
 
+### Step 0: Ensure `wiki-skills` is installed
+
+The `wiki-cli` commands require the `wiki-skills` package. Verify it is installed:
+
+```bash
+wiki-cli --version
+```
+
+If the command fails, install the package first:
+
+```bash
+uv tool install wiki-skills
+```
+
 ### Step 1: Understand the bundle structure
 
 Wiki bundles store `.md` files in a directory tree. Each file has a concept ID derived from its path relative to the bundle root (minus the `.md` extension). For example:
