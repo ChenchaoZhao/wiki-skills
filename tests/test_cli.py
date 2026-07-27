@@ -5,7 +5,7 @@ from wiki_skills.cli import main
 
 
 def test_version_is_defined() -> None:
-    assert __about__.__version__ == "0.1.0"
+    assert __about__.__version__
 
 
 def test_main_exits_via_system_exit() -> None:
@@ -22,7 +22,7 @@ def test_version_flag_prints_version(
         main()
     assert exc_info.value.code == 0
     captured = capsys.readouterr()
-    assert "0.1.0" in captured.out
+    assert __about__.__version__ in captured.out
 
 
 def test_version_subcommand(
@@ -32,7 +32,7 @@ def test_version_subcommand(
     monkeypatch.setattr("sys.argv", ["wiki-cli", "version"])
     main()
     captured = capsys.readouterr()
-    assert "0.1.0" in captured.out
+    assert __about__.__version__ in captured.out
 
 
 def test_main_help_shows_subcommands(
