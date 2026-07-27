@@ -33,10 +33,7 @@ def _setup_db(
     db_dir.mkdir(exist_ok=True)
     conn = sqlite3.connect(str(db_dir / DB_NAME))
     try:
-        conn.execute(
-            f"CREATE TABLE IF NOT EXISTS {FILES_TABLE} "
-            "(path TEXT PRIMARY KEY, type TEXT, mtime REAL)"
-        )
+        conn.execute(f"CREATE TABLE IF NOT EXISTS {FILES_TABLE} (path TEXT PRIMARY KEY, type TEXT, mtime REAL)")
         for rel_path, type_ in entries or []:
             full = bundle / rel_path
             mtime = full.stat().st_mtime if full.exists() else 0.0
@@ -164,10 +161,13 @@ class TestIsInvalidFrontmatter:
 # ---------------------------------------------------------------------------
 
 
+EXPECTED_TIMESTAMP_LINE: int = 2
+
+
 class TestFindLineNumber:
     def test_finds_key(self) -> None:
         lines = ["---\n", "timestamp: 2024-01-01\n", "tags: [a]\n", "---\n"]
-        assert _find_line_number(lines, "timestamp") == 2
+        assert _find_line_number(lines, "timestamp") == EXPECTED_TIMESTAMP_LINE
 
     def test_returns_default_when_not_found(self) -> None:
         lines = ["---\n", "type: concept\n", "---\n"]
@@ -175,7 +175,7 @@ class TestFindLineNumber:
 
     def test_finds_multiple_keys(self) -> None:
         lines = ["---\n", "timestamp: a\n", "timestamp: b\n", "---\n"]
-        assert _find_line_number(lines, "timestamp") == 2
+        assert _find_line_number(lines, "timestamp") == EXPECTED_TIMESTAMP_LINE
 
 
 # ---------------------------------------------------------------------------
@@ -194,9 +194,7 @@ class TestValidateReturnCodes:
         assert validate(str(tmp_path)) == ExitCode.ERRORS
 
     def test_warnings_return_one(self, tmp_path: Path) -> None:
-        (tmp_path / "doc.md").write_text(
-            '---\ntype: concept\ntimestamp: "bad"\n---\n'
-        )
+        (tmp_path / "doc.md").write_text('---\ntype: concept\ntimestamp: "bad"\n---\n')
         assert validate(str(tmp_path)) == ExitCode.WARNINGS
 
     def test_no_md_files_returns_one(self, tmp_path: Path) -> None:
@@ -213,17 +211,13 @@ class TestValidateMissingType:
         (tmp_path / "doc.md").write_text("---\ntitle: Hello\n---\n")
         with patch("builtins.print") as mock_print:
             validate(str(tmp_path))
-            mock_print.assert_any_call(
-                "doc.md:2: ERROR — missing or empty 'type' in frontmatter"
-            )
+            mock_print.assert_any_call("doc.md:2: ERROR — missing or empty 'type' in frontmatter")
 
     def test_empty_type_field(self, tmp_path: Path) -> None:
         (tmp_path / "doc.md").write_text("---\ntype: \n---\n")
         with patch("builtins.print") as mock_print:
             validate(str(tmp_path))
-            mock_print.assert_any_call(
-                "doc.md:2: ERROR — missing or empty 'type' in frontmatter"
-            )
+            mock_print.assert_any_call("doc.md:2: ERROR — missing or empty 'type' in frontmatter")
 
 
 # ---------------------------------------------------------------------------
@@ -236,9 +230,7 @@ class TestValidateUnparseableYaml:
         (tmp_path / "doc.md").write_text("---\ntype: [unclosed\n---\n")
         with patch("builtins.print") as mock_print:
             validate(str(tmp_path))
-            mock_print.assert_any_call(
-                "doc.md:1: ERROR — unparseable YAML frontmatter"
-            )
+            mock_print.assert_any_call("doc.md:1: ERROR — unparseable YAML frontmatter")
 
 
 # ---------------------------------------------------------------------------
@@ -248,19 +240,13 @@ class TestValidateUnparseableYaml:
 
 class TestValidateBadTimestamp:
     def test_invalid_timestamp(self, tmp_path: Path) -> None:
-        (tmp_path / "doc.md").write_text(
-            '---\ntype: concept\ntimestamp: "not-a-date"\n---\n'
-        )
+        (tmp_path / "doc.md").write_text('---\ntype: concept\ntimestamp: "not-a-date"\n---\n')
         with patch("builtins.print") as mock_print:
             validate(str(tmp_path))
-            mock_print.assert_any_call(
-                'doc.md:3: WARN — \'timestamp\' is not ISO 8601: \'not-a-date\''
-            )
+            mock_print.assert_any_call("doc.md:3: WARN — 'timestamp' is not ISO 8601: 'not-a-date'")
 
     def test_valid_timestamp_no_warning(self, tmp_path: Path) -> None:
-        (tmp_path / "doc.md").write_text(
-            '---\ntype: concept\ntimestamp: "2024-01-01T00:00:00Z"\n---\n'
-        )
+        (tmp_path / "doc.md").write_text('---\ntype: concept\ntimestamp: "2024-01-01T00:00:00Z"\n---\n')
         with patch("builtins.print") as mock_print:
             validate(str(tmp_path))
             for call_args in mock_print.call_args_list:
@@ -274,28 +260,20 @@ class TestValidateBadTimestamp:
 
 class TestValidateBadTags:
     def test_tags_not_a_list(self, tmp_path: Path) -> None:
-        (tmp_path / "doc.md").write_text(
-            '---\ntype: concept\ntags: "not-a-list"\n---\n'
-        )
+        (tmp_path / "doc.md").write_text('---\ntype: concept\ntags: "not-a-list"\n---\n')
         with patch("builtins.print") as mock_print:
             validate(str(tmp_path))
-            mock_print.assert_any_call(
-                "doc.md:3: WARN — 'tags' is not a list of strings: 'not-a-list'"
-            )
+            mock_print.assert_any_call("doc.md:3: WARN — 'tags' is not a list of strings: 'not-a-list'")
 
     def test_tags_with_non_string_items(self, tmp_path: Path) -> None:
-        (tmp_path / "doc.md").write_text(
-            "---\ntype: concept\ntags: [a, 1]\n---\n"
-        )
+        (tmp_path / "doc.md").write_text("---\ntype: concept\ntags: [a, 1]\n---\n")
         with patch("builtins.print") as mock_print:
             validate(str(tmp_path))
             found = any("tags" in str(call) for call in mock_print.call_args_list)
             assert found
 
     def test_valid_tags_no_warning(self, tmp_path: Path) -> None:
-        (tmp_path / "doc.md").write_text(
-            "---\ntype: concept\ntags: [a, b]\n---\n"
-        )
+        (tmp_path / "doc.md").write_text("---\ntype: concept\ntags: [a, b]\n---\n")
         with patch("builtins.print") as mock_print:
             validate(str(tmp_path))
             for call_args in mock_print.call_args_list:
@@ -312,9 +290,7 @@ class TestValidateEmptyBundle:
         _setup_db(tmp_path)
         with patch("builtins.print") as mock_print:
             validate(str(tmp_path))
-            mock_print.assert_any_call(
-                ".:1: WARN — empty bundle, no concept files found"
-            )
+            mock_print.assert_any_call(".:1: WARN — empty bundle, no concept files found")
 
     def test_only_reserved_files(self, tmp_path: Path) -> None:
         (tmp_path / "index.md").write_text("---\ntype: index\n---\n")
@@ -322,9 +298,7 @@ class TestValidateEmptyBundle:
         _setup_db(tmp_path)
         with patch("builtins.print") as mock_print:
             validate(str(tmp_path))
-            mock_print.assert_any_call(
-                ".:1: WARN — empty bundle, no concept files found"
-            )
+            mock_print.assert_any_call(".:1: WARN — empty bundle, no concept files found")
 
 
 # ---------------------------------------------------------------------------
@@ -337,9 +311,7 @@ class TestValidateStateDB:
         (tmp_path / "doc.md").write_text("---\ntype: concept\n---\n")
         with patch("builtins.print") as mock_print:
             validate(str(tmp_path))
-            mock_print.assert_any_call(
-                ".:1: WARN — state.db not found, run 'wiki-cli index' first"
-            )
+            mock_print.assert_any_call(".:1: WARN — state.db not found, run 'wiki-cli index' first")
 
     def test_stale_file_warns(self, tmp_path: Path) -> None:
         (tmp_path / "doc.md").write_text("---\ntype: concept\n---\n")
@@ -348,9 +320,7 @@ class TestValidateStateDB:
         (tmp_path / "doc.md").write_text("---\ntype: concept\n---\n")
         with patch("builtins.print") as mock_print:
             validate(str(tmp_path))
-            mock_print.assert_any_call(
-                "doc.md:1: WARN — file has changed since last index"
-            )
+            mock_print.assert_any_call("doc.md:1: WARN — file has changed since last index")
 
 
 # ---------------------------------------------------------------------------

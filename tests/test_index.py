@@ -10,7 +10,7 @@ from unittest.mock import patch
 if TYPE_CHECKING:
     from pathlib import Path
 
-import pytest
+    import pytest
 
 from wiki_skills.index import (
     DB_DIR_NAME,

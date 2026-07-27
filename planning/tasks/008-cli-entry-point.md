@@ -1,6 +1,6 @@
 ---
 assignee: ""
-status: "In Progress"
+status: "Done"
 priority: "Medium"
 issue_type: "Task"
 ---
@@ -13,7 +13,7 @@ Section 5 — CLI Entry Point. The CLI is the primary interface for agents. It m
 ## Acceptance Criteria
 <!-- Absolute, binary criteria derived from the design document. -->
 - [x] `cli.py` with `main()` function using `fire.Fire`
-- [ ] All 4 subcommands wired: `install`, `index`, `validate`, `query` (3/4 done; `install` pending ticket 007)
+- [x] All 4 subcommands wired: `install`, `index`, `validate`, `query` ~~(3/4 done; `install` pending ticket 007)~~
 - [x] `wiki-cli --help` shows all subcommands with descriptions
 - [x] `wiki-cli <subcommand> --help` shows flags for each subcommand
 - [x] Entry point registered in `pyproject.toml` as `wiki-cli = "wiki_skills.cli:main"`
