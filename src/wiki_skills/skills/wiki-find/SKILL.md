@@ -25,7 +25,7 @@ The `wiki-cli` commands require the `wiki-skills` package. Verify it is installe
 wiki-cli --version
 ```
 
-If the command fails, install the package first:
+If the command fails, ask human to install the package first:
 
 ```bash
 uv tool install wiki-skills
@@ -36,10 +36,10 @@ uv tool install wiki-skills
 Before querying, ensure the index is current:
 
 ```bash
-wiki-cli index [path]
+wiki-cli index <path>
 ```
 
-- `[path]` defaults to the current working directory if omitted.
+- `<path>` defaults to the current working directory if omitted.
 - This creates or updates `.wiki-skills/state.db` with metadata from all `.md` files.
 
 ### Step 2: Check for `sqlite3` CLI

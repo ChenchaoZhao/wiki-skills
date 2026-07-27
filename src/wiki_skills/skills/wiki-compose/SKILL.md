@@ -57,7 +57,7 @@ The `wiki-cli` commands require the `wiki-skills` package. Verify it is installe
 wiki-cli --version
 ```
 
-If the command fails, install the package first:
+If the command fails, ask human to install the package first:
 
 ```bash
 uv tool install wiki-skills
@@ -101,10 +101,10 @@ Content goes here...
 Run `wiki-cli validate` to check for conformance errors:
 
 ```bash
-wiki-cli validate [path]
+wiki-cli validate <path>
 ```
 
-- `[path]` defaults to the current working directory if omitted.
+- `<path>` defaults to the current working directory if omitted.
 - Exit code `0` means clean, `1` means warnings only, `2` means errors.
 
 ### Step 4: Fix and re-validate
@@ -112,7 +112,7 @@ wiki-cli validate [path]
 If the validate step reports errors, fix the frontmatter and re-run:
 
 ```bash
-wiki-cli validate [path]
+wiki-cli validate <path>
 ```
 
 Repeat until the output is clean (exit code 0).
