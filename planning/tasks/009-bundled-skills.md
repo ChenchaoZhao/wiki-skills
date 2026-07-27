@@ -1,6 +1,6 @@
 ---
 assignee: ""
-status: "To Do"
+status: "Done"
 priority: "Medium"
 issue_type: "Task"
 ---
@@ -10,14 +10,14 @@ issue_type: "Task"
 Section 7 (Bundled Skills) of the Design Document defines two bundled SKILL.md files that agents load at runtime to know how to compose and find wiki content. wiki-compose teaches the agent OKF frontmatter conventions and the validate workflow. wiki-find teaches the agent to build an index, prefer the sqlite3 CLI for querying state.db, fall back to `wiki-cli query`, and use glob to resolve file paths. Without these skill files the agent has no instructions for interacting with the wiki system.
 
 ## Acceptance Criteria
-- [ ] `src/wiki_skills/skills/wiki-compose/SKILL.md` created
-- [ ] `src/wiki_skills/skills/wiki-find/SKILL.md` created
-- [ ] wiki-compose SKILL.md includes: OKF frontmatter reference, workflow steps, validate command usage
-- [ ] wiki-find SKILL.md includes: index workflow, sqlite3 preference, wiki-cli query fallback, glob usage
-- [ ] SKILL.md files follow agent skill conventions (clear instructions, trigger conditions, step-by-step workflow)
-- [ ] Skills are included in package data via pyproject.toml
-- [ ] Unit test or smoke test that skill files exist and are non-empty
-- [ ] All referenced CLI commands match actual subcommand names
+- [x] `src/wiki_skills/skills/wiki-compose/SKILL.md` created
+- [x] `src/wiki_skills/skills/wiki-find/SKILL.md` created
+- [x] wiki-compose SKILL.md includes: OKF frontmatter reference, workflow steps, validate command usage
+- [x] wiki-find SKILL.md includes: index workflow, sqlite3 preference, wiki-cli query fallback, glob usage
+- [x] SKILL.md files follow agent skill conventions (clear instructions, trigger conditions, step-by-step workflow)
+- [x] Skills are included in package data via pyproject.toml
+- [x] Unit test or smoke test that skill files exist and are non-empty
+- [x] All referenced CLI commands match actual subcommand names
 
 ## Technical Notes and Implementation Hints
 - Core Files: `src/wiki_skills/skills/wiki-compose/SKILL.md`, `src/wiki_skills/skills/wiki-find/SKILL.md`
